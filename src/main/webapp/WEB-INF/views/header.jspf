@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><c:out value="${pageTitle}" /> – Webbshop</title>
+    <link rel="stylesheet" href="<c:url value='/assets/shop.css' />">
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a class="brand" href="<c:url value='/products' />">Webbshop</a>
+        <c:if test="${not empty currentUser}">
+            <nav aria-label="Huvudmeny">
+                <a href="<c:url value='/products' />">Varor</a>
+                <a href="<c:url value='/cart' />">Varukorg<c:if test="${not empty sessionScope.cart}"> (<c:out value="${sessionScope.cart.itemCount}" />)</c:if></a>
+                <c:if test="${currentUser.role == 'ADMIN'}">
+                    <a href="<c:url value='/admin/users' />">Användare</a>
+                    <a href="<c:url value='/admin/products' />">Hantera varor</a>
+                    <a href="<c:url value='/admin/categories' />">Kategorier</a>
+                </c:if>
+                <c:if test="${currentUser.role == 'ADMIN' or currentUser.role == 'WAREHOUSE'}">
+                    <a href="<c:url value='/warehouse/orders' />">Ordrar</a>
+                </c:if>
+            </nav>
+            <div class="session">
+                <span><c:out value="${currentUser.username}" /> · <c:out value="${currentUser.role.label}" /></span>
+                <form method="post" action="<c:url value='/logout' />">
+                    <input type="hidden" name="csrfToken" value="<c:out value='${csrfToken}' />">
+                    <button class="secondary" type="submit">Logga ut</button>
+                </form>
+            </div>
+        </c:if>
+    </div>
+</header>
+<main>
+    <h1><c:out value="${pageTitle}" /></h1>
+    <c:if test="${not empty flash}"><p class="notice" role="status"><c:out value="${flash}" /></p></c:if>
+    <c:if test="${not empty flashError}"><p class="error" role="alert"><c:out value="${flashError}" /></p></c:if>
