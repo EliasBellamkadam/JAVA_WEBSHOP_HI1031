@@ -26,7 +26,15 @@ public final class ShopService {
     public Optional<User> findActiveUser(int id) {
         return read(c -> userDao.findById(c, id).filter(User::active));
     }
-    public List<Product> products() { return read(catalogDao::products); }
+    public List<Product> products() {
+        return read(c -> {
+            List<Product> copies = new ArrayList<>();
+            for(Product product : catalogDao.products(c)) {
+                copies.add(new Product(product));
+            }
+            return List.copyOf(copies);
+        });
+    }
     public List<Category> categories() { return read(catalogDao::categories); }
 
     public CartView viewCart(Cart cart) {
@@ -37,7 +45,7 @@ public final class ShopService {
             for (var entry : snapshot.entrySet()) {
                 Product product = catalogDao.findProduct(c, entry.getKey())
                     .orElseThrow(() -> new ShopException("Varan finns inte längre."));
-                CartLine line = new CartLine(product, entry.getValue());
+                CartLine line = new CartLine(new Product(product), entry.getValue());
                 lines.add(line);
                 total = total.add(line.getTotal());
             }
